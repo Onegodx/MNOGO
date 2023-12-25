@@ -1,30 +1,60 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
+using System.Threading.Tasks;
 
-class MainClass
+class Program
 {
-    public static void Main(string[] args)
+    static bool Expression1(bool X, bool Y, bool Z)
     {
-        bool X, Y, Z;
+        return !(!X && Y) || (X && !Z);
+    }
 
-        Console.WriteLine("X  Y  Z  отрицание (X конъюнкция Y) дизъюнкция (X конъюнкция отрицание Z)  X конъюнкция отрицание(отрицание Y дизъюнкция Z) дизъюнкция Y");
+    static bool Expression2(bool X, bool Y, bool Z)
+    {
+        return X && !(!Y || Z) || Y;
+    }
 
-        for (int i = 0; i <= 1; i++)
+    static void Main()
+    {
+        // Последовательные вычисления
+        var startTime = DateTime.Now;
+        TableOfTruth();
+        var endTime = DateTime.Now;
+        Console.WriteLine($"Последовательные вычисления: {endTime - startTime}");
+
+        // Параллельные вычисления
+        startTime = DateTime.Now;
+        ParallelTableOfTruth();
+        endTime = DateTime.Now;
+        Console.WriteLine($"Параллельные вычисления: {endTime - startTime}");
+    }
+
+    static void TableOfTruth()
+    {
+        Console.WriteLine("X Y Z | Expression1 | Expression2");
+        for (int x = 0; x <= 1; x++)
         {
-            X = Convert.ToBoolean(i);
-            for (int j = 0; j <= 1; j++)
+            for (int y = 0; y <= 1; y++)
             {
-                Y = Convert.ToBoolean(j);
-                for (int k = 0; k <= 1; k++)
+                for (int z = 0; z <= 1; z++)
                 {
-                    Z = Convert.ToBoolean(k);
-                    bool problem1 = !(X && Y) || (X && !Z);
-                    bool problem2 = X && !(!Y || Z) || Y;
-                    Console.WriteLine($"{X}  {Y}  {Z}      {problem1}       {problem2}");
+                    Console.WriteLine($"{x} {y} {z} | {Expression1(x == 1, y == 1, z == 1)} | {Expression2(x == 1, y == 1, z == 1)}");
                 }
             }
         }
+    }
+
+    static void ParallelTableOfTruth()
+    {
+        Console.WriteLine("X Y Z | Expression1 | Expression2");
+        Parallel.For(0, 2, x =>
+        {
+            Parallel.For(0, 2, y =>
+            {
+                Parallel.For(0, 2, z =>
+                {
+                    Console.WriteLine($"{x} {y} {z} | {Expression1(x == 1, y == 1, z == 1)} | {Expression2(x == 1, y == 1, z == 1)}");
+                });
+            });
+        });
     }
 }
